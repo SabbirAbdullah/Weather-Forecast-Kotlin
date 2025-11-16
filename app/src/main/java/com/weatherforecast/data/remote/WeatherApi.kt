@@ -1,9 +1,8 @@
 interface WeatherApi {
-
     @GET("weather")
-    suspend fun getWeather(
+    suspend fun getWeatherByCity(
         @Query("q") city: String,
-        @Query("appid") apiKey: String = BuildConfig.WEATHER_API_KEY,
+        @Query("appid") apiKey: String = BuildConfig.OPENWEATHER_API_KEY,
         @Query("units") units: String = "metric"
     ): WeatherDto
 }
