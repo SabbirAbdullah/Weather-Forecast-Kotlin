@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.material)
     implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.androidx.material3)
     debugImplementation(libs.compose.ui.tooling)
     implementation(libs.activity.compose)
     implementation(libs.navigation.compose)
