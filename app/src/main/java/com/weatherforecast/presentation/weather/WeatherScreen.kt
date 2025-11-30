@@ -1,15 +1,15 @@
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.android.material.progressindicator.CircularProgressIndicator
-import androidx.compose.material3.Surface
+import androidx.compose.material3.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.runtime.*
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+
 @Composable
 fun WeatherScreen(viewModel: WeatherViewModel = hiltViewModel()) {
     val state = viewModel.state
