@@ -1,12 +1,36 @@
+package com.weatherforecast.presentation.weather
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.weatherforecast.domain.usecase.GetWeatherUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
-    private val getWeatherUseCase: GetWeatherUseCase
+    private val getWeatherUseCase: GetWeatherUseCase,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     var state by mutableStateOf(WeatherState())
         private set
 
-    fun onQueryChange(q: String) { state = state.copy(query = q) }
+    init {
+        // Optionally restore last query from saved state
+        savedStateHandle.get<String>("last_query")?.let { q ->
+            state = state.copy(query = q)
+        }
+    }
+
+    fun onQueryChange(q: String) {
+        state = state.copy(query = q)
+        savedStateHandle["last_query"] = q
+    }
 
     fun search() {
         val city = state.query.trim()
@@ -26,5 +50,7 @@ class WeatherViewModel @Inject constructor(
         }
     }
 
-    fun clearError() { state = state.copy(error = null) }
+    fun clearError() {
+        state = state.copy(error = null)
+    }
 }

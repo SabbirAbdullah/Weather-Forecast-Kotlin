@@ -1,12 +1,16 @@
+package com.weatherforecast.data.mapper
+
+import com.weatherforecast.data.remote.WeatherDto
+import com.weatherforecast.domain.model.WeatherInfo
+
 fun WeatherDto.toDomain(): WeatherInfo {
-    val desc = this.weather?.firstOrNull()?.description ?: "N/A"
-    val icon = this.weather?.firstOrNull()?.icon
+    val first = this.weather?.firstOrNull()
     return WeatherInfo(
         city = this.name ?: "Unknown",
-        description = desc,
-        icon = icon,
+        description = first?.description ?: "N/A",
+        icon = first?.icon,
         temperature = this.main?.temp ?: 0.0,
-        feelsLike = this.main?.feels_like,
+        feelsLike = this.main?.feelsLike,
         humidity = this.main?.humidity,
         windSpeed = this.wind?.speed
     )

@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.weatherforecast.app"
+    namespace = "com.weatherforecast"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.weatherforecast.app"
+        applicationId = "com.weatherforecast"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.material)
     implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.androidx.material3)
     debugImplementation(libs.compose.ui.tooling)
     implementation(libs.activity.compose)
     implementation(libs.navigation.compose)

@@ -1,31 +1,27 @@
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+package com.weatherforecast.data.remote
 
-@JsonClass(generateAdapter = true)
+import com.google.gson.annotations.SerializedName
+
 data class WeatherDto(
-    val coord: CoordDto?,
-    val weather: List<WeatherDescriptionDto>?,
-    val main: MainDto?,
-    val wind: WindDto?,
-    val name: String?
+    @SerializedName("coord") val coord: CoordDto?,
+    @SerializedName("weather") val weather: List<WeatherDescriptionDto>?,
+    @SerializedName("main") val main: MainDto?,
+    @SerializedName("wind") val wind: WindDto?,
+    @SerializedName("name") val name: String?
 )
 
-@JsonClass(generateAdapter = true)
 data class CoordDto(val lon: Double?, val lat: Double?)
-@JsonClass(generateAdapter = true)
 data class WeatherDescriptionDto(
     val id: Int?,
     val main: String?,
     val description: String?,
-    @Json(name = "icon") val icon: String?
+    @SerializedName("icon") val icon: String?
 )
-@JsonClass(generateAdapter = true)
 data class MainDto(
     val temp: Double?,
-    val feels_like: Double?,
-    val temp_min: Double?,
-    val temp_max: Double?,
+    @SerializedName("feels_like") val feelsLike: Double?,
+    @SerializedName("temp_min") val tempMin: Double?,
+    @SerializedName("temp_max") val tempMax: Double?,
     val humidity: Int?
 )
-@JsonClass(generateAdapter = true)
 data class WindDto(val speed: Double?, val deg: Int?)

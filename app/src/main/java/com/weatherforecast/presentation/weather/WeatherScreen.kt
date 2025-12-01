@@ -1,33 +1,46 @@
 import androidx.compose.material3.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.weatherforecast.domain.model.WeatherInfo
+import com.weatherforecast.presentation.weather.WeatherViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherScreen(viewModel: WeatherViewModel = hiltViewModel()) {
-    val state = viewModel.state
-    val scaffoldState = rememberScaffoldState()
 
-    LaunchedEffect(key1 = state.error) {
-        state.error?.let { scaffoldState.snackbarHostState.showSnackbar(it); viewModel.clearError() }
+    val state = viewModel.state
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearError()
+        }
     }
 
-    Scaffold(topBar = {
-        TopAppBar(title = { Text("Weather") }, backgroundColor = MaterialTheme.colors.primary)
-    }, scaffoldState = scaffoldState) { padding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Weather Forecast") }
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp)
         ) {
+
             SearchBar(
                 query = state.query,
                 onQueryChanged = viewModel::onQueryChange,
@@ -37,16 +50,23 @@ fun WeatherScreen(viewModel: WeatherViewModel = hiltViewModel()) {
             Spacer(modifier = Modifier.height(16.dp))
 
             if (state.isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
                     CircularProgressIndicator()
                 }
             } else {
                 state.weather?.let { weather ->
-                    WeatherCard(weather = weather)
-                } ?: run {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-                        Text("Search a city to see weather", style = MaterialTheme.typography.body1)
-                    }
+                    WeatherCard(weather)
+                } ?: Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    Text(
+                        "Search a city to see weather",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
         }
@@ -55,7 +75,12 @@ fun WeatherScreen(viewModel: WeatherViewModel = hiltViewModel()) {
 
 @Composable
 fun SearchBar(query: String, onQueryChanged: (String)->Unit, onSearch: ()->Unit) {
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
         OutlinedTextField(
             value = query,
             onValueChange = onQueryChanged,
@@ -65,7 +90,9 @@ fun SearchBar(query: String, onQueryChanged: (String)->Unit, onSearch: ()->Unit)
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = { onSearch() })
         )
+
         Spacer(Modifier.width(8.dp))
+
         Button(onClick = onSearch) {
             Text("Search")
         }
@@ -74,36 +101,44 @@ fun SearchBar(query: String, onQueryChanged: (String)->Unit, onSearch: ()->Unit)
 
 @Composable
 fun WeatherCard(weather: WeatherInfo) {
+
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = 6.dp,
-        shape = RoundedCornerShape(12.dp)
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+
             Row(verticalAlignment = Alignment.CenterVertically) {
+
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = weather.city, style = MaterialTheme.typography.h6)
-                    Text(text = weather.description.replaceFirstChar { it.uppercaseChar() }, style = MaterialTheme.typography.body2)
+                    Text(weather.city, style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        weather.description.replaceFirstChar { it.uppercaseChar() },
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
 
-                // Weather icon from OpenWeather: https://openweathermap.org/img/wn/{icon}@2x.png
                 weather.icon?.let { icon ->
                     val iconUrl = "https://openweathermap.org/img/wn/$icon@2x.png"
-                    Image(
-                        painter = rememberAsyncImagePainter(iconUrl),
+
+                    AsyncImage(
+                        model = iconUrl,
                         contentDescription = null,
                         modifier = Modifier.size(64.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Row {
-                Text(text = "${weather.temperature}°C", style = MaterialTheme.typography.h4)
-                Spacer(Modifier.width(16.dp))
+                Text(
+                    "${weather.temperature}°C",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+
+                Spacer(Modifier.width(24.dp))
+
                 Column {
                     Text("Feels like: ${weather.feelsLike ?: "-"}°C")
                     Text("Humidity: ${weather.humidity ?: "-"}%")
