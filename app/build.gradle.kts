@@ -47,6 +47,13 @@ plugins {
         }
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
+// Accompanist for permissions
+    implementation("com.google.accompanist:accompanist-permissions:0.37.3")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("androidx.compose.animation:animation:1.10.0")
+    implementation("androidx.compose.material:material-icons-core")
+    implementation("androidx.compose.material:material-icons-extended")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -81,4 +88,5 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
 }

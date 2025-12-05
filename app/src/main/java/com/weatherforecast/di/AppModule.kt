@@ -1,13 +1,18 @@
 package com.weatherforecast.di
 
+import android.content.Context
 import com.weatherforecast.data.remote.WeatherApi
 import com.weatherforecast.data.repository.WeatherRepositoryImpl
 import com.weatherforecast.domain.repository.WeatherRepository
 import com.weatherforecast.domain.usecase.GetWeatherUseCase
 import com.weatherforecast.BuildConfig
+import com.weatherforecast.data.location.LocationManager
+
+
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -71,4 +76,13 @@ object AppModule {
     @Provides
     fun provideGetWeatherUseCase(repo: WeatherRepository): GetWeatherUseCase =
         GetWeatherUseCase(repo)
+
+    @Provides
+    @Singleton
+    fun provideLocationManager(@ApplicationContext context: Context): LocationManager =
+        LocationManager(context)
+
+
+
+
 }

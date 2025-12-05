@@ -1,38 +1,59 @@
-import androidx.compose.material3.*
+package com.weatherforecast.presentation.weather
+
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.weatherforecast.domain.model.WeatherInfo
-import com.weatherforecast.presentation.weather.WeatherViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherScreen(viewModel: WeatherViewModel = hiltViewModel()) {
-
     val state = viewModel.state
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
-    LaunchedEffect(state.error) {
-        state.error?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.clearError()
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { perms ->
+            val granted = perms[android.Manifest.permission.ACCESS_FINE_LOCATION] == true
+            if (granted) viewModel.getWeatherByLocation()
         }
-    }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Weather Forecast") }
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        topBar = { TopAppBar(title = { Text("Weather Forecast") }) },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    permissionLauncher.launch(
+                        arrayOf(
+                            android.Manifest.permission.ACCESS_FINE_LOCATION,
+                            android.Manifest.permission.ACCESS_COARSE_LOCATION
+                        )
+                    )
+                }
+            ) {
+                Icon(Icons.Default.LocationOn, contentDescription = "My Location")
+            }
+        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -49,32 +70,30 @@ fun WeatherScreen(viewModel: WeatherViewModel = hiltViewModel()) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (state.isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
+            when {
+                state.isLoading -> Box(Modifier.fillMaxSize(), Alignment.Center) {
                     CircularProgressIndicator()
                 }
-            } else {
-                state.weather?.let { weather ->
-                    WeatherCard(weather)
-                } ?: Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.TopCenter
-                ) {
-                    Text(
-                        "Search a city to see weather",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+
+                state.weather != null -> WeatherCard(state.weather!!)
+
+                else -> Box(Modifier.fillMaxSize(), Alignment.Center) {
+                    Text("Search a city or use location button")
                 }
             }
+        }
+    }
+
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearError()
         }
     }
 }
 
 @Composable
-fun SearchBar(query: String, onQueryChanged: (String)->Unit, onSearch: ()->Unit) {
+fun SearchBar(query: String, onQueryChanged: (String) -> Unit, onSearch: () -> Unit) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -120,7 +139,6 @@ fun WeatherCard(weather: WeatherInfo) {
 
                 weather.icon?.let { icon ->
                     val iconUrl = "https://openweathermap.org/img/wn/$icon@2x.png"
-
                     AsyncImage(
                         model = iconUrl,
                         contentDescription = null,
